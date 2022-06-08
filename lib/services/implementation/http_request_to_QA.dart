@@ -2,26 +2,34 @@
 
 import 'package:brnl3r/models/q_and_a.dart';
 import 'package:brnl3r/services/interfaces/http_request_to_QA_interface.dart';
+import 'package:html_unescape/html_unescape.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+// void main(List<String> args) async {
+//   Questions questions = await getQAFromUrl(
+//       "https://opentdb.com/api.php?amount=6&difficulty=easy&type=multiple");
+
+//   for (final entry in questions) {
+//     print(entry);
+//   }
+// }
 
 class HttpRequestToQA implements HttpRequestToQAInterface {
   @override
   Future<Questions> getQAFromUrl(var url) async {
+    var unescape = HtmlUnescape();
+
     var decoded = await _jsonParser(url);
     Questions questions = decoded.map((entry) {
       Question question = {};
-      List<String> answers = [];
-      answers.add(entry["correct_answer"]);
-      for (final iAnswer in entry["incorrect_answers"]) {
-        answers.add(iAnswer);
-      }
-      question[entry["question"]] = answers;
+      String correct = unescape.convert(entry["correct_answer"]);
+      var incorrect = entry["incorrect_answers"]
+          .map((iAnswer) => unescape.convert(iAnswer))
+          .toList();
+      question[unescape.convert(entry["question"])] = [correct, ...incorrect];
       return question;
     }).toList();
-
-    // for (final entry in decoded) {
-    // }
 
     return questions;
   }
