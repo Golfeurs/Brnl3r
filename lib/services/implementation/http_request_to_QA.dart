@@ -21,7 +21,7 @@ class HttpRequestToQA implements HttpRequestToQAInterface {
     var unescape = HtmlUnescape();
 
     var decoded = await _jsonParser(url);
-    Questions questions = decoded.map((entry) {
+    return decoded.map((entry) {
       Question question = {};
       String correct = unescape.convert(entry["correct_answer"]);
       var incorrect = entry["incorrect_answers"]
@@ -30,8 +30,6 @@ class HttpRequestToQA implements HttpRequestToQAInterface {
       question[unescape.convert(entry["question"])] = [correct, ...incorrect];
       return question;
     }).toList();
-
-    return questions;
   }
 
   Future<List<dynamic>> _jsonParser(String url) async {
