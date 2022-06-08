@@ -5,16 +5,11 @@ import 'package:brnl3r/services/interfaces/http_request_to_QA_interface.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-// const URL =
-//     "https://opentdb.com/api.php?amount=6&difficulty=medium&type=multiple";
-
 class HttpRequestToQA implements HttpRequestToQAInterface {
   @override
   Future<Questions> getQAFromUrl(var url) async {
     var decoded = await _jsonParser(url);
-    Questions questions = [];
-
-    for (final entry in decoded) {
+    Questions questions = decoded.map((entry) {
       Question question = {};
       List<String> answers = [];
       answers.add(entry["correct_answer"]);
@@ -22,8 +17,11 @@ class HttpRequestToQA implements HttpRequestToQAInterface {
         answers.add(iAnswer);
       }
       question[entry["question"]] = answers;
-      questions.add(question);
-    }
+      return question;
+    }).toList();
+
+    // for (final entry in decoded) {
+    // }
 
     return questions;
   }
