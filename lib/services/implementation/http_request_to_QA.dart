@@ -36,14 +36,10 @@ class HttpRequestToQA implements HttpRequestToQAInterface {
     var response = await _httpRequest(url);
     var json = jsonDecode(response.body);
     assert(json is Map<String, dynamic>);
-    var results = json["results"];
-
-    return results;
+    return json["results"];
   }
 
   Future<http.Response> _httpRequest(String url) async {
-    var response = await http.get(Uri.parse(url));
-
-    return response;
+    return http.get(Uri.parse(url));
   }
 }
