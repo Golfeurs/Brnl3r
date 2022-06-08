@@ -1,5 +1,7 @@
+import 'package:brnl3r/models/players.dart';
 import 'package:flutter/material.dart';
 
+/// Widget activity to setup the game
 class GameSetup extends StatefulWidget {
   const GameSetup({Key? key}) : super(key: key);
 
@@ -12,7 +14,11 @@ class _GameSetupState extends State<GameSetup> {
 
   @override
   Widget build(BuildContext context) {
-    _submit() {}
+    _submit() {
+      // ignore: unused_local_variable
+      var players = playerNames.toPlayers();
+      // TODO : Send to next activity
+    }
 
     final addPlayerButton = OutlinedButton(
         onPressed: () {
@@ -147,5 +153,9 @@ class _PlayerNames {
           name: names[i], index: i, onDelete: onDelete, onUpdate: onUpdate));
     }
     return elem;
+  }
+
+  List<Player> toPlayers() {
+    return names.map((name) => Player(name)).toList();
   }
 }
