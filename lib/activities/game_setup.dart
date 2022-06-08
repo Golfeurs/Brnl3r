@@ -1,7 +1,7 @@
-import 'dart:ffi';
-
+import 'package:brnl3r/models/players.dart';
 import 'package:flutter/material.dart';
 
+/// Widget activity to setup the game
 class GameSetup extends StatefulWidget {
   const GameSetup({Key? key}) : super(key: key);
 
@@ -14,7 +14,11 @@ class _GameSetupState extends State<GameSetup> {
 
   @override
   Widget build(BuildContext context) {
-    _submit() {}
+    _submit() {
+      // ignore: unused_local_variable
+      var players = playerNames.toPlayers();
+      // TODO : Send to next activity
+    }
 
     final addPlayerButton = OutlinedButton(
         onPressed: () {
@@ -23,6 +27,26 @@ class _GameSetupState extends State<GameSetup> {
           });
         },
         child: const Icon(Icons.add));
+
+    playerCount() {
+      return Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 0), 
+        child: Text('Number of players : ${playerNames.count}',
+        style: Theme.of(context).textTheme.headlineSmall,)
+      );
+    }
+
+    playerListView() {
+      final listElems = playerNames.toListElems(
+          (i) => setState(() => playerNames.removeAt(i)),
+          (i, value) => playerNames.updateAt(i, value));
+
+      return Expanded(
+          flex: 3,
+          child: ListView.builder(
+              itemCount: listElems.length,
+              itemBuilder: (_, i) => listElems[i]));
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -36,7 +60,9 @@ class _GameSetupState extends State<GameSetup> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            (playerNames.toListView()),
+            playerCount(),
+            const Divider(),
+            playerListView(),
             Expanded(flex: 1, child: Center(child: addPlayerButton))
           ],
         ),
@@ -48,30 +74,41 @@ class _GameSetupState extends State<GameSetup> {
 class _ListElem extends StatelessWidget {
   final String name;
   final int index;
-  const _ListElem({Key? key,
-    required this.name,
-    required this.index
-    }) : super(key: key);
+  final void Function(int) onDelete;
+  final void Function(int, String) onUpdate;
+  const _ListElem(
+      {Key? key,
+      required this.name,
+      required this.index,
+      required this.onDelete,
+      required this.onUpdate})
+      : super(key: key);
+
 
   @override
   Widget build(BuildContext context) {
+    final controller = TextEditingController();
+    controller.text = name;
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
         children: [
-          const Expanded(
+          Expanded(
               child: Padding(
-            padding: EdgeInsets.only(right: 10),
+            padding: const EdgeInsets.only(right: 10),
             child: TextField(
-              decoration: InputDecoration(
+              controller: controller,
+              onChanged: (value) => onUpdate(index, value),
+              decoration: const InputDecoration(
                 border: OutlineInputBorder(),
                 hintText: 'Player Name',
               ),
             ),
           )),
           OutlinedButton(
+            onPressed: () => onDelete(index),
             child: const Icon(Icons.delete),
-            onPressed: () {},
           )
         ],
       ),
@@ -80,46 +117,45 @@ class _ListElem extends StatelessWidget {
 }
 
 class _PlayerNames {
-  static const MAX_PLAYER = 20;
-  static const MIN_PLAYER = 2;
-  static const DEFAULT_NAME = "";
+  static const maxPlayer = 20;
+  static const minPlayer = 2;
+  static const defaultName = "";
 
-  final names = <String>[DEFAULT_NAME, DEFAULT_NAME];
+  final names = <String>[defaultName, defaultName];
 
-  add() {
-    if (names.length < MAX_PLAYER) {
-      names.add(DEFAULT_NAME);
+  int get count {
+    return names.length;
+  }
+
+  void add() {
+    if (names.length < maxPlayer) {
+      names.add(defaultName);
     }
   }
 
-  updateAt(String newName, int idx) {
+  void updateAt(int idx, String newName) {
     if (idx < names.length) {
       names[idx] = newName;
     }
   }
 
-  removeAt(int idx) {
-    if (names.length > MIN_PLAYER && idx < names.length) {
+  void removeAt(int idx) {
+    if (names.length > minPlayer && idx < names.length) {
       names.removeAt(idx);
     }
   }
 
-  List<_ListElem> toListElems() {
+  List<_ListElem> toListElems(
+      void Function(int) onDelete, void Function(int, String) onUpdate) {
     final elem = <_ListElem>[];
     for (var i = 0; i < names.length; i++) {
-      elem.add(_ListElem(name: names[i], index: i));
+      elem.add(_ListElem(
+          name: names[i], index: i, onDelete: onDelete, onUpdate: onUpdate));
     }
     return elem;
   }
 
-  Widget toListView() {
-    final elems = toListElems();
-
-    return Expanded(
-      flex: 3,
-        child: ListView.builder(
-      itemCount: elems.length,
-      itemBuilder: (_, i) => elems[i],
-    ));
+  List<Player> toPlayers() {
+    return names.map((name) => Player(name)).toList();
   }
 }
