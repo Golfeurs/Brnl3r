@@ -37,7 +37,7 @@ class _SettingsMenuState extends State<SettingsMenu> {
         padding: const EdgeInsets.all(50.0),
         child: Center(
           child: Column(children: [
-            const Text("Amount of questions per card:"),
+            const Text("Number of questions per card:"),
             DropdownButton<String>(
               items: amoutQ
                   .map((e) => DropdownMenuItem(
