@@ -8,7 +8,6 @@ class GameSetup extends StatefulWidget {
 
   @override
   State<GameSetup> createState() => _GameSetupState();
-
 }
 
 class _GameSetupState extends State<GameSetup> {
@@ -17,10 +16,15 @@ class _GameSetupState extends State<GameSetup> {
   @override
   Widget build(BuildContext context) {
     _submit() {
-      var players = playerNames.toPlayers();
+      final players = playerNames.toPlayers();
+      final playersAreValid = Player.playersAreValid(players);
 
       // check that all players are valids
-      if(players.fold<bool>(true, (prev, player) => prev && player.isValid)){
+      if (playersAreValid != null) {
+        // Send error Message
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Error : $playersAreValid')));
+      } else {
         Navigator.pop(context);
         Navigator.push(
             context, MaterialPageRoute(builder: (_) => Game(players: players)));
