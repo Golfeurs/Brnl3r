@@ -1,3 +1,4 @@
+import 'package:brnl3r/activities/game.dart';
 import 'package:brnl3r/models/players.dart';
 import 'package:flutter/material.dart';
 
@@ -7,6 +8,7 @@ class GameSetup extends StatefulWidget {
 
   @override
   State<GameSetup> createState() => _GameSetupState();
+
 }
 
 class _GameSetupState extends State<GameSetup> {
@@ -15,9 +17,14 @@ class _GameSetupState extends State<GameSetup> {
   @override
   Widget build(BuildContext context) {
     _submit() {
-      // ignore: unused_local_variable
       var players = playerNames.toPlayers();
-      // TODO : Send to next activity
+
+      // check that all players are valids
+      if(players.fold<bool>(true, (prev, player) => prev && player.isValid)){
+        Navigator.pop(context);
+        Navigator.push(
+            context, MaterialPageRoute(builder: (_) => Game(players: players)));
+      }
     }
 
     final addPlayerButton = OutlinedButton(
@@ -30,10 +37,11 @@ class _GameSetupState extends State<GameSetup> {
 
     playerCount() {
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 0), 
-        child: Text('Number of players : ${playerNames.count}',
-        style: Theme.of(context).textTheme.headlineSmall,)
-      );
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 0),
+          child: Text(
+            'Number of players : ${playerNames.count}',
+            style: Theme.of(context).textTheme.headlineSmall,
+          ));
     }
 
     playerListView() {
@@ -83,7 +91,6 @@ class _ListElem extends StatelessWidget {
       required this.onDelete,
       required this.onUpdate})
       : super(key: key);
-
 
   @override
   Widget build(BuildContext context) {
@@ -156,6 +163,10 @@ class _PlayerNames {
   }
 
   List<Player> toPlayers() {
-    return names.map((name) => Player(name)).toList();
+    var players = <Player>[];
+    for (var i = 0; i < names.length; i++) {
+      players.add(Player(i, names[i]));
+    }
+    return players;
   }
 }
