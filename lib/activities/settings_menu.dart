@@ -45,6 +45,12 @@ class _SettingsMenuState extends State<SettingsMenu> {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString("amountQ", _amountDropdownValue);
     await prefs.setString("difficulty", _diffDropdownValue);
+
+    //https://opentdb.com/api.php?amount=6&difficulty=easy&type=multiple
+    String url =
+        "https://opentdb.com/api.php?amount=$_amountDropdownValue&difficulty=$_diffDropdownValue&type=multiple";
+
+    await prefs.setString("url", url);
   }
 
   void amountDropdownCallback(String? selectedValue) {
