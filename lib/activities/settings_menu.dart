@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:brnl3r/services/implementation/fetch_settings.dart';
 
 class SettingsMenu extends StatefulWidget {
   const SettingsMenu({Key? key}) : super(key: key);
@@ -11,10 +12,10 @@ class SettingsMenu extends StatefulWidget {
 }
 
 class _SettingsMenuState extends State<SettingsMenu> {
-  List<String> amoutQ = ["3", "4", "5", "6", "7", "8", "9", "10"];
-  List<String> difficulty = ["easy", "medium", "hard"];
-  String _amountDropdownValue = "6";
-  String _diffDropdownValue = "medium";
+  static const List<String> amoutQ = ["3", "4", "5", "6", "7", "8", "9", "10"];
+  static const List<String> difficulty = ["easy", "medium", "hard"];
+  String _amountDropdownValue = amoutQ[3];
+  String _diffDropdownValue = difficulty[1];
 
   //run storage code on widget launch
   @override
@@ -25,9 +26,8 @@ class _SettingsMenuState extends State<SettingsMenu> {
 
   //get settings data from storage. If null, use default
   void getData() async {
-    final prefs = await SharedPreferences.getInstance();
-    String? storedAmoutQ = prefs.getString("amountQ");
-    String? storedDifficulty = prefs.getString("difficulty");
+    String? storedAmoutQ = await FetchSettings().getData("amoutQ");
+    String? storedDifficulty = await FetchSettings().getData("difficulty");
 
     setState(() {
       if (storedAmoutQ is String) {
@@ -42,15 +42,8 @@ class _SettingsMenuState extends State<SettingsMenu> {
 
   //store settings data
   void setData() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString("amountQ", _amountDropdownValue);
-    await prefs.setString("difficulty", _diffDropdownValue);
-
-    //https://opentdb.com/api.php?amount=6&difficulty=easy&type=multiple
-    String url =
-        "https://opentdb.com/api.php?amount=$_amountDropdownValue&difficulty=$_diffDropdownValue&type=multiple";
-
-    await prefs.setString("url", url);
+    FetchSettings().setData("amoutQ", _amountDropdownValue);
+    FetchSettings().setData("difficulty", _diffDropdownValue);
   }
 
   void amountDropdownCallback(String? selectedValue) {
