@@ -13,16 +13,22 @@ class DefaultRule extends Rules {
   }
 
   _dispatchStandard(PlayCard card, GameState gameState) {
+    gameState.currentAction = standardRuleText[card.order];
     switch (card.order) {
-      case Order.eight: gameState.makeNextShadow();
-      break;
+      case Order.eight:
+        gameState.makeNextShadow();
+        break;
       default:
         break;
     }
   }
 
   _dispatchShadow(PlayCard card, GameState gameState) {
+    gameState.currentAction = shadowRuleText[card.order];
     switch (card.order) {
+      case Order.eight:
+        gameState.makeNextShadow();
+        break;
       default:
         break;
     }
@@ -45,36 +51,84 @@ Le but est de deviner qui a eu la vodka. Ceux qui ont deviné distribuent deux g
     Order.five: """
 La personne avec le moins dans son verre cul sec.
 """,
-Order.six: """
+    Order.six: """
 Le tireur invente une nouvelle règle (elle peut ètre valable toute la partie).
 """,
-Order.seven: """
-Le joueur à la gauche du tireur se rince le gosier.
+    Order.seven: """
+Le joueur à la gauche du tireur se rince le gosier (une gorgées).
 """,
-Order.eight: """
+    Order.eight: """
 Le tireur boit une gorgée. La prochaine carte est *SHADOW*.
 """,
-Order.nine: """
-Le joueur a droite du tireur, ainsi que vos daronnes boivent une gorgée.
+    Order.nine: """
+Les 2 joueurs a droite du tireur rince leurs pintes (une gorgées).
 """,
-Order.ten: """
-Le tireur décide d'un multiplicateur et se lie à un joueur.
-Le premier des deux qui boit multiplie le nombre de gorgées par le multiplicateur.
+    Order.ten: """
+Le tireur décide d'un multiplicateur. Il s'applique aléatoirement aux joueurs.
 """,
-Order.j: """
+    Order.j: """
 Feuille-cailloux-ciseaux/shi-fu-mi/ntm entre le tireur et les joueurs. 
-2 gorgées pour le perdant.
+2 gorgées pour le perdant. 2 gorgées à chaque égalité.
 """,
-Order.q: """
+    Order.q: """
 Le tireur dis un mot. Le joeur suivant répète les mots dit précédemment et un nouveau mot.
 Ainsi de suite jusqu'à une erreur. Le joueur aillant commit une faute boit autant de gorgées qu'il y a eut de mots.
 """,
-Order.k: """
-Le tireur distribue 5 gorgées.
+    Order.k: """
+Diost
 """,
-Order.a: """
+    Order.a: """
 Le tireur fait faire un cul sec, ou..., peut le jouer un quite ou double au shifumi avec un joueur de son choix.
 #koudurSiTuPerds
+""",
+  };
+
+  static const shadowRuleText = <Order, String>{
+    Order.two: """
+Le tireur décide rapidement d'un mot. Les joeurs ont 1min. pour trouver le plus de chason possible contentant le mots.
+Si égalité shifumi. Les perdant boivent autant de gorgées que de chanson (min. 1).
+""",
+    Order.three: """
+Le tireur répond au question d'une carte de trivial poursuite (ou autre). Il boit 2 gorgées par réponse fausse.
+Si la carte entière est correct, les autres joueurs boivent 5 gorgées.
+""",
+    Order.four: """
+*SHADOW* Seul le tireur reste dans la pièce. Il rempli 1 shot d'EAU et le reste de shot de VODKA, un shot par joueur.
+Les joueurs reviennent dans la pièce et prennent aléatoirement un shot (sans le sentir). Cul sec! 
+Le but est de deviner qui a eu l'EAU. Ceux qui ont deviné distribuent deux gorgées.
+""",
+    Order.five: """
+La personne avec le plus dans son verre cul sec.
+""",
+    Order.six: """
+Les autres invente une règle s'appliquant uniquement au tireur.
+""",
+    Order.seven: """
+Les 2 joueurs à la gauche du tireur se murge le groin (une gorgées).
+""",
+    Order.eight: """
+Le tireur boit 4 gorgée. La prochaine carte est *SHADOW*.
+""",
+    Order.nine: """
+Le joueur a droite du tireur, ainsi que vos daronnes boivent une gorgée.
+""",
+    Order.ten: """
+Le tireur décide d'un multiplicateur et se lie à un joueur.
+Le premier des deux qui boit multiplie le nombre de gorgées par le multiplicateur.
+""",
+    Order.j: """
+Feuille-cailloux-ciseaux/shi-fu-mi/ntm entre le tireur et les joueurs. 
+2 gorgées pour le perdant.
+""",
+    Order.q: """
+Jeu du singe: Le tireur donne un thème. Les joueurs donne des mots du thème.
+Le premier qui commet une faute, cul sec. (Sinon, jeu des mots "réplique golfique")
+""",
+    Order.k: """
+Le tireur distribue autant de gorgées qu'il veut mais en bois le même nombre.
+""",
+    Order.a: """
+Le tireur joue un cul sec au shifumi avec un joueur de son choix.
 """,
   };
 }
