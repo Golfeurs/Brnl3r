@@ -1,7 +1,6 @@
 //Settings widget
 
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:brnl3r/services/implementation/fetch_settings.dart';
 
 class SettingsMenu extends StatefulWidget {
