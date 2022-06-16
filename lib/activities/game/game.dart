@@ -1,4 +1,4 @@
-import 'package:brnl3r/models/play_card.dart';
+import 'package:brnl3r/models/game_state.dart';
 import 'package:brnl3r/models/players.dart';
 import 'package:flutter/material.dart';
 
@@ -36,38 +36,57 @@ class Game extends StatelessWidget {
           appBar: AppBar(
             title: const Text('Playing BRNL3R'),
           ),
-          body: Center(
-            child: CardStackView(onFinish: () => Navigator.pop(context),),
+          body: GameView(
+            onFinish: () => Navigator.pop(context),
+            players: players,
           ),
         ));
   }
 }
 
-class CardStackView extends StatefulWidget {
+class GameView extends StatefulWidget {
   final void Function() onFinish;
-  const CardStackView({Key? key, required this.onFinish}) : super(key: key);
+  final List<Player> players;
+
+  const GameView({Key? key, required this.onFinish, required this.players})
+      : super(key: key);
 
   @override
-  State<CardStackView> createState() => _CardStackViewState();
+  State<GameView> createState() => _GameViewState();
 }
 
-class _CardStackViewState extends State<CardStackView> {
-  final List<PlayCard> cards = [...(PlayCard.cards)]..shuffle();
+class _GameViewState extends State<GameView> {
+  // ignore: prefer_typing_uninitialized_variables
+  late final GameState _gameState;
+
+  @override
+  void initState() {
+    _gameState = GameState(widget.players);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => setState(() {
-        if(cards.isNotEmpty){
-          cards.removeAt(0);
-        } else {
-          // STOP ACTIVITY
-          widget.onFinish();
-        }
-      }),
-      child: Expanded(
-        child: cards.isEmpty ? const Text("Finshed") : Text("${cards.length} : ${cards.first}"),
-      )
-    );
+    return CardView(
+        gameState: _gameState,
+        onCardTapped: () => setState(() => _gameState.updateAndNextRound()));
+  }
+}
+
+class CardView extends StatelessWidget {
+  final GameState gameState;
+  final void Function() onCardTapped;
+
+  const CardView(
+      {Key? key, required this.gameState, required this.onCardTapped})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+        child: InkWell(
+      onTap: onCardTapped,
+      child: Center(child: Text(gameState.topCard.toString())),
+    ));
   }
 }

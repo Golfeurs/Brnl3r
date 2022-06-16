@@ -65,4 +65,13 @@ class PlayCard {
   String toString() {
     return isJoker() ? "$order" : "$kind$order";
   }
+
+  @override
+  int get hashCode => (order.index << 2) + kind.index;
+  
+  @override
+  bool operator ==(Object other) {
+    return (other is PlayCard) && other.kind == kind && other.order == order;
+  }
+  
 }

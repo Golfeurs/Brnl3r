@@ -1,4 +1,4 @@
-import 'package:brnl3r/activities/game.dart';
+import 'package:brnl3r/activities/game/game.dart';
 import 'package:brnl3r/models/players.dart';
 import 'package:flutter/material.dart';
 
