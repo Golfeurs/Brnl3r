@@ -1,5 +1,6 @@
 import 'package:brnl3r/models/game_state.dart';
 import 'package:brnl3r/models/players.dart';
+import 'package:brnl3r/models/rules/default_rule.dart';
 import 'package:flutter/material.dart';
 
 class Game extends StatelessWidget {
@@ -62,6 +63,7 @@ class _GameViewState extends State<GameView> {
   @override
   void initState() {
     _gameState = GameState(widget.players);
+    DefaultRule().updatedGameState(_gameState);
     super.initState();
   }
 
@@ -69,7 +71,13 @@ class _GameViewState extends State<GameView> {
   Widget build(BuildContext context) {
     return CardView(
         gameState: _gameState,
-        onCardTapped: () => setState(() => _gameState.updateAndNextRound()));
+        onCardTapped: () => setState(() {
+              _gameState.updateAndNextRound();
+              if (_gameState.isFinished) {
+                widget.onFinish();
+              }
+              DefaultRule().updatedGameState(_gameState);
+            }));
   }
 }
 
@@ -77,16 +85,48 @@ class CardView extends StatelessWidget {
   final GameState gameState;
   final void Function() onCardTapped;
 
+  static final color1 = Colors.grey.shade900;
+  static const color2 = Colors.white;
+
+  Color get textColor => !gameState.isShadow ? color1 : color2;
+  Color get bgColor => gameState.isShadow ? color1 : color2;
+
   const CardView(
       {Key? key, required this.gameState, required this.onCardTapped})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-        child: InkWell(
-      onTap: onCardTapped,
-      child: Center(child: Text(gameState.topCard.toString())),
-    ));
+    return Container(
+      color: bgColor,
+      child: InkWell(
+        onTap: onCardTapped,
+        child: Center(
+            child: Column(
+          children: [
+            Expanded(
+                flex: 1,
+                child: Center(
+                    child: Text(
+                  gameState.topCard.toString(),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 50, color: textColor),
+                ))),
+            Expanded(
+                flex: 3,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 50.0, vertical: 30.0),
+                  child: Text(
+                    gameState.currentAction.toString(),
+                    textAlign: TextAlign.center,
+                    style:
+                        TextStyle(fontSize: 20, height: 1.5, color: textColor),
+                  ),
+                ))
+          ],
+        )),
+      ),
+    );
   }
 }

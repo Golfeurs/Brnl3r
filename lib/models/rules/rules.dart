@@ -1,8 +1,7 @@
 import 'package:brnl3r/models/game_state.dart';
-import 'package:brnl3r/models/play_card.dart';
 
 abstract class Rules {
-  void updatedGameState(PlayCard card, GameState gameState);
+  void updatedGameState(GameState gameState);
 }
 
 ///

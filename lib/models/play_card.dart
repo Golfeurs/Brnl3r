@@ -7,7 +7,6 @@ enum Kind {
   final String name;
   final bool isRed;
   const Kind(this.name, this.isRed);
-  
 
   @override
   String toString() {
@@ -31,7 +30,6 @@ enum Order {
   a("A"),
   joker("🃏Joker🃏");
 
-
   final String name;
   const Order(this.name);
 
@@ -45,15 +43,15 @@ class PlayCard {
   final Kind kind;
   final Order order;
 
-  static final cards = (){
+  static cards() {
     final list = <PlayCard>[];
     for (final kind in Kind.values) {
-      for(final order in Order.values) {
+      for (final order in Order.values) {
         list.add(PlayCard(kind, order));
       }
     }
     return list;
-  }();
+  }
 
   const PlayCard(this.kind, this.order);
 
@@ -68,10 +66,9 @@ class PlayCard {
 
   @override
   int get hashCode => (order.index << 2) + kind.index;
-  
+
   @override
   bool operator ==(Object other) {
     return (other is PlayCard) && other.kind == kind && other.order == order;
   }
-  
 }
