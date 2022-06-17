@@ -67,6 +67,8 @@ class GameState {
 
   bool get isFinished => _cards.isEmpty;
 
+  Player get currentPlayer => _players[_currRound];
+
   void makeNextShadow() => shadowQueue.add(true);
 
   void makePlayAgain() => playAgain = true;

@@ -108,12 +108,20 @@ class CardView extends StatelessWidget {
                 flex: 1,
                 child: Center(
                     child: Text(
+                  "Au tour de : ${gameState.currentPlayer.name}",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 20, color: textColor),
+                ))),
+            Expanded(
+                flex: 1,
+                child: Center(
+                    child: Text(
                   gameState.topCard.toString(),
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 50, color: textColor),
                 ))),
             Expanded(
-                flex: 3,
+                flex: 5,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 50.0, vertical: 30.0),
