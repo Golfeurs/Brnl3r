@@ -56,32 +56,53 @@ class GameView extends StatefulWidget {
   State<GameView> createState() => _GameViewState();
 }
 
-class _GameViewState extends State<GameView> {
+class _GameViewState extends State<GameView>
+    with SingleTickerProviderStateMixin {
   // ignore: prefer_typing_uninitialized_variables
   late final GameState _gameState;
 
+  late AnimationController _slideAnimationController;
+
   @override
   void initState() {
+    _slideAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _slideAnimationController.forward();
     _gameState = GameState(widget.players);
     DefaultRule().updatedGameState(_gameState);
+
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _slideAnimationController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return CardView(
-        gameState: _gameState,
-        onCardTapped: () => setState(() {
-              _gameState.updateAndNextRound();
-              if (_gameState.isFinished) {
-                widget.onFinish();
-              }
-              DefaultRule().updatedGameState(_gameState);
-            }));
+      gameState: _gameState,
+      onCardTapped: () => setState(() {
+        _gameState.updateAndNextRound();
+        if (_gameState.isFinished) {
+          widget.onFinish();
+        }
+        DefaultRule().updatedGameState(_gameState);
+        _slideAnimationController.reset();
+        _slideAnimationController.forward();
+      }),
+      animationController: _slideAnimationController,
+    );
   }
 }
 
 class CardView extends StatelessWidget {
+  final AnimationController animationController;
+
   final GameState gameState;
   final void Function() onCardTapped;
 
@@ -92,12 +113,15 @@ class CardView extends StatelessWidget {
   Color get bgColor => gameState.isShadow ? color1 : color2;
 
   const CardView(
-      {Key? key, required this.gameState, required this.onCardTapped})
+      {Key? key,
+      required this.gameState,
+      required this.onCardTapped,
+      required this.animationController})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return slideTransitionBuilder(Container(
       color: bgColor,
       child: InkWell(
         onTap: onCardTapped,
@@ -107,11 +131,13 @@ class CardView extends StatelessWidget {
             Expanded(
                 flex: 1,
                 child: Center(
-                    child: Text(
-                  gameState.topCard.toString(),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 50, color: textColor),
-                ))),
+                  child: Text(
+                    key: ValueKey(gameState.topCard.toString()),
+                    gameState.topCard.toString(),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 50, color: textColor),
+                  ),
+                )),
             Expanded(
                 flex: 3,
                 child: Padding(
@@ -127,6 +153,13 @@ class CardView extends StatelessWidget {
           ],
         )),
       ),
-    );
+    ));
+  }
+
+  SlideTransition slideTransitionBuilder(Widget child) {
+    return SlideTransition(
+        position: Tween<Offset>(begin: const Offset(3, 0), end: Offset.zero)
+            .animate(animationController),
+        child: child);
   }
 }
