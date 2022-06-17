@@ -1,5 +1,6 @@
 import 'package:brnl3r/activities/game_setup.dart';
 import 'package:flutter/material.dart';
+import 'package:brnl3r/activities/settings_menu.dart';
 
 class MyHomePage extends StatelessWidget {
   const MyHomePage({Key? key}) : super(key: key);
@@ -16,29 +17,36 @@ class MyHomePage extends StatelessWidget {
             title,
             style: Theme.of(context).textTheme.headlineMedium,
           ),
-        )
-      );
+        ));
 
     final body = Expanded(
-      flex: 2,
-      child: Center(
-        child: Column(
-          children: [
-            OutlinedButton(
-              onPressed: () => Navigator.push(context, MaterialPageRoute(builder: 
-                (_) => GameSetup(key: key,)
-              )), child: const Text("START GAME")
-            )
-          ],
-        ),
-      ));
+        flex: 2,
+        child: Center(
+          child: Column(
+            children: [
+              OutlinedButton(
+                  onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (_) => GameSetup(
+                                key: key,
+                              ))),
+                  child: const Text("START GAME"))
+            ],
+          ),
+        ));
 
     return Scaffold(
       appBar: AppBar(
         title: Text(title),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => SettingsMenu(
+                      key: key,
+                    ))),
         child: const Icon(Icons.settings),
       ),
       body: Center(
