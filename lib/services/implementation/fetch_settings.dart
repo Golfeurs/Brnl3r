@@ -5,6 +5,9 @@ import 'package:brnl3r/services/interfaces/fetch_settings_interface.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FetchSettings implements FetchSettingsInterface {
+  static const String difficultyKey = "difficulty";
+  static const String amountQKey = "amoutQ";
+
   @override
   Future<String?> getData(String key) async {
     final prefs = await SharedPreferences.getInstance();
@@ -19,11 +22,18 @@ class FetchSettings implements FetchSettingsInterface {
   }
 
   @override
-  Future<String?> getQuestionUrl() async {
+  Future<String?> getQuestionDifficulty() async {
     final prefs = await SharedPreferences.getInstance();
-    String? amount = prefs.getString("amoutQ");
-    String? difficulty = prefs.getString("difficulty");
+    String? difficulty = prefs.getString(difficultyKey);
 
-    return "https://opentdb.com/api.php?amount=$amount&difficulty=$difficulty&type=multiple";
+    return difficulty;
+  }
+
+  @override
+  Future<String?> getQuestionAmount() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? amount = prefs.getString(amountQKey);
+
+    return amount;
   }
 }
