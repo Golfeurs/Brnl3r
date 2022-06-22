@@ -1,4 +1,5 @@
-import 'package:brnl3r/activities/game/score_popup.dart';
+import 'package:brnl3r/activities/game/score_dialog.dart';
+import 'package:brnl3r/activities/game/summary_dialog.dart';
 import 'package:brnl3r/models/game_state.dart';
 import 'package:brnl3r/models/players.dart';
 import 'package:brnl3r/models/rules/default_rule.dart';
@@ -92,7 +93,9 @@ class _GameViewState extends State<GameView>
     setState(() {
       _gameState.addRoundScoreBoard(scoreThisRound ?? {});
 
-      _gameState.updateAndNextRound();
+      final roundSummary = _gameState.updateAndNextRound();
+
+      showSummaryDialog(context, roundSummary);
 
       // GAME FINISHED ?
       if (_gameState.isFinished) {

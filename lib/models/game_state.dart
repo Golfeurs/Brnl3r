@@ -18,7 +18,6 @@ class GameState {
   /// Player who drinks in the current round
   final ScoreBoard _roundScoreBoard = {};
   var playAgain = false;
-  ScoreBoard _summary = {};
 
   GameState(this._players) {
     for (var p in _players) {
@@ -39,9 +38,8 @@ class GameState {
 
   void _resetAction() => currentAction = null;
 
-  void _updateScoreBoard() {
-    // update GAME scoreboard
-    _summary = {};
+  ScoreBoard _updateScoreBoard() {
+    ScoreBoard summaryScoreBoard = {};
 
     _roundScoreBoard.forEach((p, s) {
       var score = s;
@@ -52,17 +50,19 @@ class GameState {
             b.setUsed();
           }
         }
-        _summary.update(p, (_) => score, ifAbsent: () => score);
+        summaryScoreBoard.update(p, (_) => score, ifAbsent: () => score);
       }
     });
 
-    _summary.forEach((p, s) {
+    summaryScoreBoard.forEach((p, s) {
       _gameScoreBoard.update(p, (v) => v + s);
     });
     // reset ROUND scoreboard
     _gameScoreBoard.forEach((p, _) {
       _roundScoreBoard.update(p, (_) => 0);
     });
+
+    return summaryScoreBoard;
   }
 
   void _updateShadow() {
@@ -73,14 +73,12 @@ class GameState {
     }
   }
 
-  void _cleanBindings() {
+  /// remove and return old `DrinkBindings`
+  List<DrinkBindings> _removeOldBindings() {
+    final oldBindings = _bindings.where((b) => b.used).toList();
     final newList = _bindings.where((b) => b.notUsed);
     _bindings..clear()..addAll(newList);
-  }
-
-  ScoreBoard get roundSummary {
-    final sum = _summary.values.fold<int>(0, (prev, e) => prev + e);
-    return sum > 0 ? _summary : {};
+    return oldBindings;
   }
 
   void addBinding(DrinkBindings db) => _bindings.add(db);
@@ -95,16 +93,18 @@ class GameState {
   /// advance to next round, reset action, scoard board
   ///
   /// Call at the end of a round
-  void updateAndNextRound() {
+  RoundSummary? updateAndNextRound() {
     if (!isFinished) {
       _resetAction();
-      _updateScoreBoard();
-      _cleanBindings();
+      final scoreboard = _updateScoreBoard();
       _cards.removeAt(0);
+      final oldBindings = _removeOldBindings();
       _currRound = playAgain ? _currRound : (_currRound + 1) % _players.length;
       playAgain = false;
       _updateShadow();
+      return RoundSummary(scoreboard, oldBindings);
     }
+    return null;
   }
 
   bool get isFinished => _cards.isEmpty;
@@ -131,4 +131,28 @@ class DrinkBindings {
   void setUsed() => _used = true;
 
   bool contains(Player p) => _players.contains(p);
+}
+
+class RoundSummary {
+  final ScoreBoard roundScoreboard;
+  final List<DrinkBindings> _roundBindings;
+  
+  const RoundSummary(this.roundScoreboard, this._roundBindings);
+
+  Map<Player, int> userToMultiplier() {
+    final result = <Player, int>{};
+    for (var b in _roundBindings) { 
+      roundScoreboard.forEach((p, _) {
+        if(b.contains(p)){
+          result.update(p, (m) => b.multiplier * m, ifAbsent: () => b.multiplier);
+        }
+      });
+    }
+    return result;
+  }
+
+  bool isNeeded() {
+    roundScoreboard.removeWhere((_, value) => value <= 0);
+    return roundScoreboard.isNotEmpty;
+  }
 }
