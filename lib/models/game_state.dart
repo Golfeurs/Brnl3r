@@ -16,13 +16,13 @@ class GameState {
 
   // --- ROUND DATA ---
   /// Player who drinks in the current round
-  final ScoreBoard roundScoreBoard = {};
+  final ScoreBoard _roundScoreBoard = {};
   var playAgain = false;
 
   GameState(this._players) {
     for (var p in _players) {
       gameScoreBoard.putIfAbsent(p, () => 0);
-      roundScoreBoard.putIfAbsent(p, () => 0);
+      _roundScoreBoard.putIfAbsent(p, () => 0);
     }
   }
 
@@ -30,16 +30,23 @@ class GameState {
 
   bool get isShadow => shadowQueue.first;
 
+  void addRoundScoreBoard(ScoreBoard that) {
+    that.forEach((p, s) {
+      _roundScoreBoard.update(p, (value) => value + s);
+    });
+  }
+
   void _resetAction() => currentAction = null;
 
   void _updateScoreBoard() {
     // update GAME scoreboard
-    roundScoreBoard.forEach((p, s) {
+    _roundScoreBoard.forEach((p, s) {
+      // TODO : check bindings ...
       gameScoreBoard.update(p, (v) => v + s);
     });
     // reset ROUND scoreboard
     gameScoreBoard.forEach((p, _) {
-      roundScoreBoard.update(p, (_) => 0);
+      _roundScoreBoard.update(p, (_) => 0);
     });
   }
 

@@ -1,28 +1,36 @@
+import 'package:brnl3r/models/scoreboard.dart';
 import 'package:flutter/material.dart';
 
-class TallyDialog extends StatefulWidget {
-  TallyDialog({Key? key, required this.limit}) : super(key: key);
+import '../../models/players.dart';
 
-  int limit = 5;
+class TallyDialog extends StatefulWidget {
+  final int limit;
+  final List<Player> players;
+  
+  const TallyDialog({Key? key, required this.players, this.limit = 10000}) : super(key: key);
+
 
   @override
   State<TallyDialog> createState() => _TallyDialogState();
 }
 
 class _TallyDialogState extends State<TallyDialog> {
-  //need to get player list and player scores
-  final List<String> _players = ["Player 1", "Player 2", "Player 3", "Roméo"];
-  final List<int> _playerCounters = [0, 0, 0, 0];
-  int _sum = 0;
-  int limit = 0;
+  void onFinish() {
+    Navigator.of(context).pop(_playersToScore);
+  }
+
+  final ScoreBoard _playersToScore = {};
   late SnackBar snackBar;
 
   @override
   void initState() {
-    limit = widget.limit;
+    // setup map of player to score
+    for (var element in widget.players) {
+      _playersToScore.putIfAbsent(element, () => 0);
+    }
     snackBar = SnackBar(
       content: Text(
-        "Total cannot be more than $limit",
+        "Total cannot be more than ${widget.limit}",
         style: const TextStyle(fontSize: 20, color: Colors.white),
       ),
     );
@@ -37,6 +45,8 @@ class _TallyDialogState extends State<TallyDialog> {
 
   StatefulBuilder playerCounter(
       BuildContext context, double screenWidth, double screenHeight) {
+    final players = _playersToScore.entries.toList();
+    final sum = _playersToScore.values.reduce((value, element) => value + element);
     return StatefulBuilder(builder: (context, setState) {
       return AlertDialog(
         title: const Text('Player tally'),
@@ -44,26 +54,27 @@ class _TallyDialogState extends State<TallyDialog> {
           height: screenHeight * .5,
           width: screenWidth * .7,
           child: ListView.builder(
-            itemCount: _players.length,
+            itemCount: players.length,
             itemBuilder: (_, index) => SizedBox(
               height: screenHeight / 20,
               child: Row(
-                children: playerRowBuilder(index),
+                children: playerRowBuilder(players[index]),
               ),
             ),
           ),
         ),
         actions: <Widget>[
-          Text("Total : ${_sum.toString()}"),
+          Text("Total : ${sum.toString()}"),
           TextButton(
             child: const Text('Done'),
             onPressed: () {
-              _sum > limit
-                  ? ScaffoldMessenger.of(context).showSnackBar(snackBar)
-                  : () {
-                      Navigator.of(context).pop();
-                      returnScore();
-                    }.call();
+              if(sum > widget.limit) {
+                   ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              } else {
+                () {
+                  onFinish();
+                }.call();
+              }
             },
           ),
         ],
@@ -71,24 +82,24 @@ class _TallyDialogState extends State<TallyDialog> {
     });
   }
 
-  List<Widget> playerRowBuilder(int index) {
+  List<Widget> playerRowBuilder(MapEntry<Player, int> playerData) {
     return [
-      Expanded(flex: 4, child: Text(_players[index])),
+      Expanded(flex: 4, child: Text(playerData.key.name)),
       Expanded(
         flex: 2,
         child: IconButton(
-          onPressed: () => _scoreButonCallback(index, -1),
+          onPressed: () => _scoreButtonCallback(playerData.key, -1),
           icon: Icon(
             Icons.remove_circle,
             color: Colors.redAccent[400],
           ),
         ),
       ),
-      Expanded(flex: 1, child: Text(_playerCounters[index].toString())),
+      Expanded(flex: 1, child: Text(playerData.value.toString())),
       Expanded(
         flex: 1,
         child: IconButton(
-          onPressed: () => _scoreButonCallback(index, 1),
+          onPressed: () => _scoreButtonCallback(playerData.key, 1),
           icon: Icon(
             Icons.add_circle,
             color: Colors.greenAccent[400],
@@ -98,21 +109,9 @@ class _TallyDialogState extends State<TallyDialog> {
     ];
   }
 
-  void _scoreButonCallback(int index, int score) {
-    int newScore = _playerCounters[index] + score;
+  void _scoreButtonCallback(Player player, int score) {
     setState(() {
-      if (newScore >= 0) {
-        _playerCounters[index] = newScore;
-      }
-      _sum = _playerCounters.reduce((a, b) => a + b);
+      _playersToScore.update(player, (value) => (value + score < 0) ? 0 : value + score);
     });
-  }
-
-  Map<String, int> returnScore() {
-    Map<String, int> scoreboard = {};
-    for (var i = 0; i < _players.length; i++) {
-      scoreboard[_players[i]] = _playerCounters[i];
-    }
-    return scoreboard;
   }
 }

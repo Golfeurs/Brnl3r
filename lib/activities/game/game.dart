@@ -1,6 +1,8 @@
+import 'package:brnl3r/activities/game/score_popup.dart';
 import 'package:brnl3r/models/game_state.dart';
 import 'package:brnl3r/models/players.dart';
 import 'package:brnl3r/models/rules/default_rule.dart';
+import 'package:brnl3r/models/scoreboard.dart';
 import 'package:flutter/material.dart';
 
 class Game extends StatelessWidget {
@@ -82,19 +84,35 @@ class _GameViewState extends State<GameView>
     super.dispose();
   }
 
+  Future<void> setStateForNextRound() async {
+    final scoreThisRound = await showDialog<ScoreBoard>(context: context, builder: (ctx) {
+      return TallyDialog(players: widget.players);
+    });
+
+    setState(() {
+      _gameState.addRoundScoreBoard(scoreThisRound ?? {});
+
+      _gameState.updateAndNextRound();
+
+      // GAME FINISHED ?
+      if (_gameState.isFinished) {
+        widget.onFinish();
+      }
+
+      // UPDATE GAME STATE FROM RULES
+      DefaultRule().updatedGameState(_gameState);
+
+      // ANIMATIONS
+      _slideAnimationController.reset();
+      _slideAnimationController.forward();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return CardView(
       gameState: _gameState,
-      onCardTapped: () => setState(() {
-        _gameState.updateAndNextRound();
-        if (_gameState.isFinished) {
-          widget.onFinish();
-        }
-        DefaultRule().updatedGameState(_gameState);
-        _slideAnimationController.reset();
-        _slideAnimationController.forward();
-      }),
+      onCardTapped: () => setStateForNextRound(),
       animationController: _slideAnimationController,
     );
   }
