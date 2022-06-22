@@ -1,10 +1,11 @@
 import 'package:brnl3r/models/play_card.dart';
 import 'package:brnl3r/models/players.dart';
 import 'package:brnl3r/models/scoreboard.dart';
+import 'package:flutter/material.dart';
 
 class GameState {
   // --- GAME DATA ---
-  final List<PlayCard> _cards = PlayCard.cards()..shuffle();
+  final List<PlayCard> _cards = [const PlayCard(Kind.club, Order.ten),...(PlayCard.cards()..shuffle())];
   final List<Player> _players;
   int _currRound = 0;
   String? currentAction;
@@ -17,6 +18,7 @@ class GameState {
   // --- ROUND DATA ---
   /// Player who drinks in the current round
   final ScoreBoard _roundScoreBoard = {};
+  Widget? _contextualRoundDialog;
   var playAgain = false;
 
   GameState(this._players) {
@@ -95,6 +97,7 @@ class GameState {
   /// Call at the end of a round
   RoundSummary? updateAndNextRound() {
     if (!isFinished) {
+      _contextualRoundDialog = null;
       _resetAction();
       final scoreboard = _updateScoreBoard();
       _cards.removeAt(0);
@@ -107,13 +110,31 @@ class GameState {
     return null;
   }
 
+  Future<void> showContextualDialog(BuildContext context) async {
+    Widget? dialog = _contextualRoundDialog;
+    if(dialog != null){
+      await showDialog(context: context, builder: (_) => dialog);
+    }
+  }
+
   bool get isFinished => _cards.isEmpty;
 
   Player get currentPlayer => _players[_currRound];
 
+  List<Player> get players => List.of(_players);
+
+  List<Player> get otherPlayers => List.of(_players)..remove(currentPlayer);
+
   void makeNextShadow() => shadowQueue.add(true);
 
   void makePlayAgain() => playAgain = true;
+
+
+  set contextualRoundDialog(Widget contextualRoundDialog) {
+    if(_contextualRoundDialog != null) { return; }
+
+    _contextualRoundDialog = contextualRoundDialog;
+  }
 }
 
 class DrinkBindings {

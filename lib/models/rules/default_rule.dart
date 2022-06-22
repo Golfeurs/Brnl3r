@@ -1,3 +1,4 @@
+import 'package:brnl3r/activities/default_rule_dialogs/multiplier_dialog.dart';
 import 'package:brnl3r/models/play_card.dart';
 import 'package:brnl3r/models/game_state.dart';
 import 'package:brnl3r/models/rules/rules.dart';
@@ -33,6 +34,12 @@ class DefaultRule extends Rules {
         break;
       case Order.eight:
         gameState.makeNextShadow();
+        break;
+      case Order.ten:
+        gameState.contextualRoundDialog = MultiplierDialog(
+          selectablePlayer: gameState.otherPlayers, 
+          onFinish: (t) => gameState.addBinding(DrinkBindings(t.e2, {t.e1}))
+        );
         break;
       default:
         break;

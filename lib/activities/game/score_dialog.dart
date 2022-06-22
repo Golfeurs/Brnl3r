@@ -6,8 +6,9 @@ import '../../models/players.dart';
 class TallyDialog extends StatefulWidget {
   final int limit;
   final List<Player> players;
+  final String title;
   
-  const TallyDialog({Key? key, required this.players, this.limit = 10000}) : super(key: key);
+  const TallyDialog({Key? key, required this.title, required this.players, this.limit = 10000}) : super(key: key);
 
 
   @override
@@ -49,7 +50,7 @@ class _TallyDialogState extends State<TallyDialog> {
     final sum = _playersToScore.values.reduce((value, element) => value + element);
     return StatefulBuilder(builder: (context, setState) {
       return AlertDialog(
-        title: const Text('Player tally'),
+        title: Text(widget.title),
         content: SizedBox(
           height: screenHeight * .5,
           width: screenWidth * .7,

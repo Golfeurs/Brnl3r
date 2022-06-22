@@ -36,14 +36,9 @@ class Game extends StatelessWidget {
           );
           return canLeave ?? false;
         },
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text('Playing BRNL3R'),
-          ),
-          body: GameView(
-            onFinish: () => Navigator.pop(context),
-            players: players,
-          ),
+        child: GameView(
+          onFinish: () => Navigator.pop(context),
+          players: players,
         ));
   }
 }
@@ -86,9 +81,14 @@ class _GameViewState extends State<GameView>
   }
 
   Future<void> setStateForNextRound() async {
-    final scoreThisRound = await showDialog<ScoreBoard>(context: context, builder: (ctx) {
-      return TallyDialog(players: widget.players);
-    });
+    await _gameState.showContextualDialog(context);
+
+    final scoreThisRound = await showDialog<ScoreBoard>(
+        context: context,
+        builder: (ctx) {
+          return TallyDialog(
+              title: 'Players ScoreBoard', players: widget.players);
+        });
 
     setState(() {
       _gameState.addRoundScoreBoard(scoreThisRound ?? {});
@@ -113,10 +113,15 @@ class _GameViewState extends State<GameView>
 
   @override
   Widget build(BuildContext context) {
-    return CardView(
-      gameState: _gameState,
-      onCardTapped: () => setStateForNextRound(),
-      animationController: _slideAnimationController,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Playing BRNL3R'),
+      ),
+      body: CardView(
+        gameState: _gameState,
+        onCardTapped: () => setStateForNextRound(),
+        animationController: _slideAnimationController,
+      ),
     );
   }
 }
