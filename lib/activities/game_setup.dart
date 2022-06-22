@@ -109,6 +109,7 @@ class _ListElem extends StatelessWidget {
               child: Padding(
             padding: const EdgeInsets.only(right: 10),
             child: TextField(
+              textCapitalization: TextCapitalization.words,
               controller: controller,
               onChanged: (value) => onUpdate(index, value),
               decoration: const InputDecoration(
@@ -117,7 +118,7 @@ class _ListElem extends StatelessWidget {
               ),
             ),
           )),
-          OutlinedButton(
+          TextButton(
             onPressed: () => onDelete(index),
             child: const Icon(Icons.delete),
           )
