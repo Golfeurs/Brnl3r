@@ -4,5 +4,6 @@
 abstract class FetchSettingsInterface {
   Future<String?> getData(String key);
   void setData(String key, String value);
-  Future<String?> getQuestionUrl();
+  Future<String?> getQuestionDifficulty();
+  Future<String?> getQuestionAmount();
 }
