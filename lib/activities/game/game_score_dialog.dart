@@ -1,5 +1,4 @@
 import 'package:brnl3r/models/game_state.dart';
-import 'package:brnl3r/models/players.dart';
 import 'package:flutter/material.dart';
 
 class GameScoreDialog extends StatelessWidget {
@@ -8,21 +7,22 @@ class GameScoreDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rows = <TableRow>[];
+    final rows = <Widget>[];
     gameState.gameScoreBoard.forEach((p, s) {
-      rows.add(TableRow(children: [Text(p.name), const Text(':'), Text('$s'), const Text('')]));
+      rows..add(Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 30),
+        child: Row(children: [
+          Expanded(flex:3, child: Text(p.name)),
+          const Expanded(flex: 1,child: Text('|'),) ,
+          Expanded(flex: 2, child: Text('$s')),
+          const Spacer()
+        ]),
+      ))..add(const Padding(
+        padding: EdgeInsets.symmetric(vertical: 0, horizontal: 25),
+        child: Divider(),
+      ));
     });
 
-    return SimpleDialog(title: const Text('Game Score'), children: [
-      Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 30),
-        child: Table(columnWidths: const {
-          0: FlexColumnWidth(2),
-          1: FlexColumnWidth(),
-          2: FlexColumnWidth(2),
-          3: FlexColumnWidth(5),
-        }, children: rows),
-      )
-    ]);
+    return SimpleDialog(title: const Text('Game Score'), children:rows..removeLast());
   }
 }
