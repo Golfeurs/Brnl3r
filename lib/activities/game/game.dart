@@ -93,6 +93,10 @@ class _GameViewState extends State<GameView>
 
   Future<void> setStateForNextRound() async {
     await _gameState.showContextualDialog(context);
+    
+    if(_gameState.roundNeedScoreBoard) {
+      await addToRoundScoreBoardDialog();
+    }
 
     setState(() {
       final roundSummary = _gameState.updateAndNextRound();

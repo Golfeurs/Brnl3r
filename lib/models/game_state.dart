@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:brnl3r/models/play_card.dart';
 import 'package:brnl3r/models/players.dart';
 import 'package:brnl3r/models/scoreboard.dart';
@@ -20,6 +22,7 @@ class GameState {
   final ScoreBoard _roundScoreBoard = {};
   Widget? _contextualRoundDialog;
   var playAgain = false;
+  var roundNeedScoreBoard = false;
 
   GameState(this._players) {
     for (var p in _players) {
@@ -97,6 +100,12 @@ class GameState {
     return _players[newIdx];
   }
 
+  void addScoreToPlayerWithOffset(Player p, int offset, int added) {
+    final targetPlayer = getPlayerFromOffset(p, offset);
+    _roundScoreBoard.update(targetPlayer, (value) => value + added,
+        ifAbsent: () => added);
+  }
+
   /// advance to next round, reset action, scoard board
   ///
   /// Call at the end of a round
@@ -111,6 +120,7 @@ class GameState {
 
       _currRound = playAgain ? _currRound : (_currRound + 1) % _players.length;
       playAgain = false;
+      roundNeedScoreBoard = false;
       _updateShadow();
       return RoundSummary(scoreboard, oldBindings);
     }
@@ -152,6 +162,18 @@ class DrinkBindings {
   final int multiplier;
   final Set<Player> _players;
   bool _used = false;
+
+  static DrinkBindings bindingFromRandom(
+      int max, Player curr, List<Player> other, double proba) {
+    final set = {curr};
+    for (final p in other) {
+      if (Random().nextDouble() < proba) {
+        set.add(p);
+      }
+    }
+    int multiplier = Random().nextInt(2) + 3;
+    return DrinkBindings(multiplier, set);
+  }
 
   DrinkBindings(this.multiplier, this._players);
 

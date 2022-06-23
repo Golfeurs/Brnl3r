@@ -28,12 +28,29 @@ class DefaultRule extends Rules {
   _dispatchStandard(PlayCard card, GameState gameState) {
     gameState.currentAction = standardRuleText[card.order];
     switch (card.order) {
+      case Order.two:
+      case Order.three:
+      case Order.four:
+      case Order.five:
+      case Order.j:
+      case Order.q:
+      case Order.k:
+      case Order.a:
+        gameState.roundNeedScoreBoard = true;
+        break;
       case Order.joker:
         gameState.makePlayAgain();
         gameState.makeNextShadow();
         break;
+      case Order.seven:
+        gameState.addScoreToPlayerWithOffset(gameState.currentPlayer, -1, 1);
+        break;
       case Order.eight:
+        gameState.addScoreToPlayerWithOffset(gameState.currentPlayer, 0, 1);
         gameState.makeNextShadow();
+        break;
+      case Order.nine:
+        gameState.addScoreToPlayerWithOffset(gameState.currentPlayer, 1, 1);
         break;
       case Order.ten:
         gameState.contextualRoundDialog = MultiplierDialog(
@@ -49,9 +66,32 @@ class DefaultRule extends Rules {
   _dispatchShadow(PlayCard card, GameState gameState) {
     gameState.currentAction = shadowRuleText[card.order];
     switch (card.order) {
+      case Order.two:
+      case Order.three:
+      case Order.four:
+      case Order.five:
+      case Order.j:
+      case Order.q:
+      case Order.k:
+      case Order.a:
+        gameState.roundNeedScoreBoard = true;
+        break;
+      case Order.seven:
+        gameState.addScoreToPlayerWithOffset(gameState.currentPlayer, -2, 1);
+        gameState.addScoreToPlayerWithOffset(gameState.currentPlayer, -1, 1);
+        break;
       case Order.eight:
+        gameState.addScoreToPlayerWithOffset(gameState.currentPlayer, 0, 4);
         gameState.makeNextShadow();
         gameState.makeNextShadow();
+        break;
+      case Order.nine:
+        gameState.addScoreToPlayerWithOffset(gameState.currentPlayer, -2, 1);
+        gameState.addScoreToPlayerWithOffset(gameState.currentPlayer, -1, 1);
+        break;
+      case Order.ten:
+        gameState.addBinding(DrinkBindings.bindingFromRandom(
+            5, gameState.currentPlayer, gameState.otherPlayers, 0.5));
         break;
       case Order.joker:
         gameState.makePlayAgain();
@@ -146,7 +186,8 @@ Le tireur boit 4 gorgée. Les deux prochaines cartes sont *SHADOW*.
 Le joueur a droite du tireur, ainsi que vos daronnes boivent une gorgée.
 """,
     Order.ten: """
-Le tireur décide d'un multiplicateur. Il s'applique aléatoirement aux joueurs.
+Un multplicateur choisi aléatoirement entre 2 et 5 (compris) s'applique au tireur
+et à 50% de chance de s'appliquer à chacun des joueurs.
 """,
     Order.j: """
 Feuille-cailloux-ciseaux/shi-fu-mi/ntm entre le tireur et les joueurs. 
