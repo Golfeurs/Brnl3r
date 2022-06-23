@@ -118,9 +118,9 @@ class _GameViewState extends State<GameView>
       appBar: AppBar(
         title: const Text('Playing BRNL3R'),
         actions: [
-          TextButton(onPressed: () {
+          IconButton(onPressed: () {
             showDialog(context: context, builder: (_) => GameScoreDialog(gameState: _gameState));
-          }, child: const Icon(Icons.scoreboard))
+          }, icon: const Icon(Icons.scoreboard))
         ],
       ),
       body: CardView(
