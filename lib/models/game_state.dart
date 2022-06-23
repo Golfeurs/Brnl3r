@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class GameState {
   // --- GAME DATA ---
-  final List<PlayCard> _cards =PlayCard.cards()..shuffle();
+  final List<PlayCard> _cards = PlayCard.cards()..shuffle();
   final List<Player> _players;
   int _currRound = 0;
   String? currentAction;
@@ -45,9 +45,9 @@ class GameState {
 
     _roundScoreBoard.forEach((p, s) {
       var score = s;
-      if(score > 0){
+      if (score > 0) {
         for (var b in _bindings) {
-          if(b.contains(p)) {
+          if (b.contains(p)) {
             score = score * b.multiplier;
             b.setUsed();
           }
@@ -79,7 +79,9 @@ class GameState {
   List<DrinkBindings> _removeOldBindings() {
     final oldBindings = _bindings.where((b) => b.used).toList();
     final newList = _bindings.where((b) => b.notUsed);
-    _bindings..clear()..addAll(newList);
+    _bindings
+      ..clear()
+      ..addAll(newList);
     return oldBindings;
   }
 
@@ -112,7 +114,7 @@ class GameState {
 
   Future<void> showContextualDialog(BuildContext context) async {
     Widget? dialog = _contextualRoundDialog;
-    if(dialog != null){
+    if (dialog != null) {
       await showDialog(context: context, builder: (_) => dialog);
     }
   }
@@ -132,7 +134,9 @@ class GameState {
   ScoreBoard get gameScoreBoard => Map.of(_gameScoreBoard);
 
   set contextualRoundDialog(Widget contextualRoundDialog) {
-    if(_contextualRoundDialog != null) { return; }
+    if (_contextualRoundDialog != null) {
+      return;
+    }
 
     _contextualRoundDialog = contextualRoundDialog;
   }
@@ -143,7 +147,7 @@ class DrinkBindings {
   final int multiplier;
   final Set<Player> _players;
   bool _used = false;
- 
+
   DrinkBindings(this.multiplier, this._players);
 
   bool get used => _used;
@@ -158,15 +162,16 @@ class DrinkBindings {
 class RoundSummary {
   final ScoreBoard roundScoreboard;
   final List<DrinkBindings> _roundBindings;
-  
+
   const RoundSummary(this.roundScoreboard, this._roundBindings);
 
   Map<Player, int> userToMultiplier() {
     final result = <Player, int>{};
-    for (var b in _roundBindings) { 
+    for (var b in _roundBindings) {
       roundScoreboard.forEach((p, _) {
-        if(b.contains(p)){
-          result.update(p, (m) => b.multiplier * m, ifAbsent: () => b.multiplier);
+        if (b.contains(p)) {
+          result.update(p, (m) => b.multiplier * m,
+              ifAbsent: () => b.multiplier);
         }
       });
     }

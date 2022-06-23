@@ -37,9 +37,9 @@ class DefaultRule extends Rules {
         break;
       case Order.ten:
         gameState.contextualRoundDialog = MultiplierDialog(
-          selectablePlayer: gameState.otherPlayers, 
-          onFinish: (t) => gameState.addBinding(DrinkBindings(t.e2, {t.e1}))
-        );
+            selectablePlayer: gameState.otherPlayers,
+            onFinish: (t) => gameState.addBinding(
+                DrinkBindings(t.e2, {t.e1, gameState.currentPlayer})));
         break;
       default:
         break;
