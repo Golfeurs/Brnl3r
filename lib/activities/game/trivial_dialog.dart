@@ -1,9 +1,12 @@
+import 'package:brnl3r/models/utils/tuples.dart';
 import 'package:flutter/material.dart';
 import 'package:brnl3r/services/implementation/fetch_settings.dart';
 import 'package:brnl3r/services/implementation/http_request_to_QA.dart';
 
 class TrivialDialog extends StatefulWidget {
-  const TrivialDialog({Key? key}) : super(key: key);
+  const TrivialDialog({Key? key, required this.onFinish}) : super(key: key);
+
+  final void Function(Tuple2<int, int>) onFinish;
 
   @override
   State<TrivialDialog> createState() => _TrivialDialogState();

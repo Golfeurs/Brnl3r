@@ -1,4 +1,5 @@
 import 'package:brnl3r/activities/default_rule_dialogs/multiplier_dialog.dart';
+import 'package:brnl3r/activities/game/trivial_dialog.dart';
 import 'package:brnl3r/models/play_card.dart';
 import 'package:brnl3r/models/game_state.dart';
 import 'package:brnl3r/models/rules/rules.dart';
@@ -29,7 +30,6 @@ class DefaultRule extends Rules {
     gameState.currentAction = standardRuleText[card.order];
     switch (card.order) {
       case Order.two:
-      case Order.three:
       case Order.four:
       case Order.five:
       case Order.j:
@@ -37,6 +37,12 @@ class DefaultRule extends Rules {
       case Order.k:
       case Order.a:
         gameState.roundNeedScoreBoard = true;
+        break;
+      case Order.three:
+        gameState.roundNeedScoreBoard = true;
+        gameState.contextualRoundDialog = TrivialDialog(
+          onFinish: (_) {},
+        );
         break;
       case Order.joker:
         gameState.makePlayAgain();
@@ -67,7 +73,6 @@ class DefaultRule extends Rules {
     gameState.currentAction = shadowRuleText[card.order];
     switch (card.order) {
       case Order.two:
-      case Order.three:
       case Order.four:
       case Order.five:
       case Order.j:
@@ -75,6 +80,12 @@ class DefaultRule extends Rules {
       case Order.k:
       case Order.a:
         gameState.roundNeedScoreBoard = true;
+        break;
+      case Order.three:
+        gameState.roundNeedScoreBoard = true;
+        gameState.contextualRoundDialog = TrivialDialog(
+          onFinish: (_) {},
+        );
         break;
       case Order.seven:
         gameState.addScoreToPlayerWithOffset(gameState.currentPlayer, -2, 1);
