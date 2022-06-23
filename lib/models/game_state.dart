@@ -49,6 +49,7 @@ class GameState {
         for (var b in _bindings) {
           if (b.contains(p)) {
             score = score * b.multiplier;
+
             b.setUsed();
           }
         }
@@ -78,10 +79,12 @@ class GameState {
   /// remove and return old `DrinkBindings`
   List<DrinkBindings> _removeOldBindings() {
     final oldBindings = _bindings.where((b) => b.used).toList();
-    final newList = _bindings.where((b) => b.notUsed);
+    final newList = _bindings.where((b) => b.notUsed).toList();
+
     _bindings
       ..clear()
       ..addAll(newList);
+
     return oldBindings;
   }
 
@@ -103,7 +106,9 @@ class GameState {
       _resetAction();
       final scoreboard = _updateScoreBoard();
       _cards.removeAt(0);
+
       final oldBindings = _removeOldBindings();
+
       _currRound = playAgain ? _currRound : (_currRound + 1) % _players.length;
       playAgain = false;
       _updateShadow();

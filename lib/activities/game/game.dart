@@ -81,19 +81,20 @@ class _GameViewState extends State<GameView>
     super.dispose();
   }
 
-  Future<void> setStateForNextRound() async {
-    await _gameState.showContextualDialog(context);
-
-    final scoreThisRound = await showDialog<ScoreBoard>(
+  Future<void> addToRoundScoreBoardDialog() async {
+    ScoreBoard? addScoreBoard = await showDialog<ScoreBoard>(
         context: context,
         builder: (ctx) {
           return TallyDialog(
               title: 'Players ScoreBoard', players: widget.players);
         });
+    setState(() => _gameState.addRoundScoreBoard(addScoreBoard ?? {}));
+  }
+
+  Future<void> setStateForNextRound() async {
+    await _gameState.showContextualDialog(context);
 
     setState(() {
-      _gameState.addRoundScoreBoard(scoreThisRound ?? {});
-
       final roundSummary = _gameState.updateAndNextRound();
 
       showSummaryDialog(context, roundSummary);
@@ -118,9 +119,16 @@ class _GameViewState extends State<GameView>
       appBar: AppBar(
         title: const Text('Playing BRNL3R'),
         actions: [
-          IconButton(onPressed: () {
-            showDialog(context: context, builder: (_) => GameScoreDialog(gameState: _gameState));
-          }, icon: const Icon(Icons.scoreboard))
+          IconButton(
+              onPressed: addToRoundScoreBoardDialog,
+              icon: const Icon(Icons.add)),
+          IconButton(
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (_) => GameScoreDialog(gameState: _gameState));
+              },
+              icon: const Icon(Icons.scoreboard))
         ],
       ),
       body: CardView(
