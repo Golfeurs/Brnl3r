@@ -1,4 +1,5 @@
-import 'package:brnl3r/activities/game/score_dialog.dart';
+import 'package:brnl3r/activities/game/game_score_dialog.dart';
+import 'package:brnl3r/activities/game/score_write_dialog.dart';
 import 'package:brnl3r/activities/game/summary_dialog.dart';
 import 'package:brnl3r/models/game_state.dart';
 import 'package:brnl3r/models/players.dart';
@@ -116,6 +117,11 @@ class _GameViewState extends State<GameView>
     return Scaffold(
       appBar: AppBar(
         title: const Text('Playing BRNL3R'),
+        actions: [
+          TextButton(onPressed: () {
+            showDialog(context: context, builder: (_) => GameScoreDialog(gameState: _gameState));
+          }, child: const Icon(Icons.scoreboard))
+        ],
       ),
       body: CardView(
         gameState: _gameState,

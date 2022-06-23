@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 class GameState {
   // --- GAME DATA ---
-  final List<PlayCard> _cards = [const PlayCard(Kind.club, Order.ten),...(PlayCard.cards()..shuffle())];
+  final List<PlayCard> _cards =PlayCard.cards()..shuffle();
   final List<Player> _players;
   int _currRound = 0;
   String? currentAction;
@@ -129,6 +129,7 @@ class GameState {
 
   void makePlayAgain() => playAgain = true;
 
+  ScoreBoard get gameScoreBoard => Map.of(_gameScoreBoard);
 
   set contextualRoundDialog(Widget contextualRoundDialog) {
     if(_contextualRoundDialog != null) { return; }
