@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:brnl3r/models/scoreboard.dart';
 import 'package:flutter/material.dart';
 
@@ -7,9 +9,13 @@ class TallyDialog extends StatefulWidget {
   final int limit;
   final List<Player> players;
   final String title;
-  
-  const TallyDialog({Key? key, required this.title, required this.players, this.limit = 10000}) : super(key: key);
 
+  const TallyDialog(
+      {Key? key,
+      required this.title,
+      required this.players,
+      this.limit = 10000})
+      : super(key: key);
 
   @override
   State<TallyDialog> createState() => _TallyDialogState();
@@ -47,13 +53,14 @@ class _TallyDialogState extends State<TallyDialog> {
   StatefulBuilder playerCounter(
       BuildContext context, double screenWidth, double screenHeight) {
     final players = _playersToScore.entries.toList();
-    final sum = _playersToScore.values.reduce((value, element) => value + element);
+    final sum =
+        _playersToScore.values.reduce((value, element) => value + element);
     return StatefulBuilder(builder: (context, setState) {
       return AlertDialog(
         title: Text(widget.title),
         content: SizedBox(
           height: screenHeight * .5,
-          width: screenWidth * .7,
+          width: min(screenWidth * .7, 300),
           child: ListView.builder(
             itemCount: players.length,
             itemBuilder: (_, index) => SizedBox(
@@ -69,8 +76,8 @@ class _TallyDialogState extends State<TallyDialog> {
           TextButton(
             child: const Text('Done'),
             onPressed: () {
-              if(sum > widget.limit) {
-                   ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              if (sum > widget.limit) {
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
               } else {
                 () {
                   onFinish();
@@ -112,7 +119,8 @@ class _TallyDialogState extends State<TallyDialog> {
 
   void _scoreButtonCallback(Player player, int score) {
     setState(() {
-      _playersToScore.update(player, (value) => (value + score < 0) ? 0 : value + score);
+      _playersToScore.update(
+          player, (value) => (value + score < 0) ? 0 : value + score);
     });
   }
 }
