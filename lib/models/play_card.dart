@@ -43,7 +43,7 @@ class PlayCard {
   final Kind kind;
   final Order order;
 
-  static cards() {
+  static List<PlayCard> cards() {
     final list = <PlayCard>[];
     for (final kind in Kind.values) {
       for (final order in Order.values) {

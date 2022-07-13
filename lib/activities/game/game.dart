@@ -1,6 +1,10 @@
+import 'package:brnl3r/activities/game/game_score_dialog.dart';
+import 'package:brnl3r/activities/game/score_write_dialog.dart';
+import 'package:brnl3r/activities/game/summary_dialog.dart';
 import 'package:brnl3r/models/game_state.dart';
 import 'package:brnl3r/models/players.dart';
 import 'package:brnl3r/models/rules/default_rule.dart';
+import 'package:brnl3r/models/scoreboard.dart';
 import 'package:flutter/material.dart';
 
 class Game extends StatelessWidget {
@@ -33,14 +37,9 @@ class Game extends StatelessWidget {
           );
           return canLeave ?? false;
         },
-        child: Scaffold(
-          appBar: AppBar(
-            title: const Text('Playing BRNL3R'),
-          ),
-          body: GameView(
-            onFinish: () => Navigator.pop(context),
-            players: players,
-          ),
+        child: GameView(
+          onFinish: () => Navigator.pop(context),
+          players: players,
         ));
   }
 }
@@ -82,20 +81,65 @@ class _GameViewState extends State<GameView>
     super.dispose();
   }
 
+  Future<void> addToRoundScoreBoardDialog() async {
+    ScoreBoard? addScoreBoard = await showDialog<ScoreBoard>(
+        context: context,
+        builder: (ctx) {
+          return TallyDialog(
+              title: 'Players ScoreBoard', players: widget.players);
+        });
+    setState(() => _gameState.addRoundScoreBoard(addScoreBoard ?? {}));
+  }
+
+  Future<void> setStateForNextRound() async {
+    await _gameState.showContextualDialog(context);
+    
+    if(_gameState.roundNeedScoreBoard) {
+      await addToRoundScoreBoardDialog();
+    }
+
+    setState(() {
+      final roundSummary = _gameState.updateAndNextRound();
+
+      showSummaryDialog(context, roundSummary);
+
+      // GAME FINISHED ?
+      if (_gameState.isFinished) {
+        widget.onFinish();
+      }
+
+      // UPDATE GAME STATE FROM RULES
+      DefaultRule().updatedGameState(_gameState);
+
+      // ANIMATIONS
+      _slideAnimationController.reset();
+      _slideAnimationController.forward();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return CardView(
-      gameState: _gameState,
-      onCardTapped: () => setState(() {
-        _gameState.updateAndNextRound();
-        if (_gameState.isFinished) {
-          widget.onFinish();
-        }
-        DefaultRule().updatedGameState(_gameState);
-        _slideAnimationController.reset();
-        _slideAnimationController.forward();
-      }),
-      animationController: _slideAnimationController,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Playing BRNL3R'),
+        actions: [
+          IconButton(
+              onPressed: addToRoundScoreBoardDialog,
+              icon: const Icon(Icons.add)),
+          IconButton(
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (_) => GameScoreDialog(gameState: _gameState));
+              },
+              icon: const Icon(Icons.scoreboard))
+        ],
+      ),
+      body: CardView(
+        gameState: _gameState,
+        onCardTapped: () => setStateForNextRound(),
+        animationController: _slideAnimationController,
+      ),
     );
   }
 }
